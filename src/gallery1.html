@@ -7,9 +7,20 @@
     <link rel="stylesheet" href="css/common.css" />
   </head>
   <body>
-    <p><a href="index.html">Go back</a></p>
+    <p class="goBack"><a class="goback-link" href="index.html">Go back</a></p>
 
-    
+  <div class="box">
+      <form class="search-form" id="search-form">
+        <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." />
+        <button type="submit" class="submit-btn">Search</button>
+      </form>
+  </div>
+
+    <div class="gallery">
+      <!-- Картки зображень -->
+    </div>
+
+    <button type="button" class="load-more">Load more</button>
 
     <script src="js/gallery1.js" type="module"></script>
   </body>
