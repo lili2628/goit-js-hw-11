@@ -69,7 +69,7 @@ async function onLoadMore() {
             const { hits, totalHits } = await searchService.fetchArticles();
 
             appendPhotoCardMarkup(hits);
-            endOfCollection(totalHits, searchService.viewedPhotoes, searchService.perPage);
+            //endOfCollection(totalHits, searchService.viewedPhotoes, searchService.perPage);
             smoothScroll('gallery');
 
             if (totalHits <= searchService.viewedPhotoes) {
@@ -99,7 +99,6 @@ function onScroll() {
 
 function isSearchQueryAmpty(searchQuery) {
     if (searchQuery === '') {
-        loadMoreBtn.hide();
         Notiflix.Notify.warning("Please, enter a search query!");
 
         return true;
