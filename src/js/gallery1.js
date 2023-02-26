@@ -17,7 +17,7 @@ let lastScroll = 0;
 
 searchFormEl.addEventListener('submit', onSearch);
 loadMoreBtn.button.addEventListener('click', onLoadMore);
-window.addEventListener('scroll', throttle(onScroll, 750));
+window.addEventListener('scroll', throttle(onScroll, 1000));
 
 async function onSearch(e) {
     e.preventDefault();
