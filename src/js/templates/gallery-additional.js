@@ -2,7 +2,7 @@ export default function galleryCardAdditionalTpl(image) {
     const { webformatURL, largeImageURL, tags, likes, views, comments, downloads } = image;
     
     return `
-        <a class=gallery__item href=${largeImageURL}>
+        <a class=gallery_item href=${largeImageURL}>
             <div class=photo-card-box>
                 <img class=gallery_image src=${webformatURL} alt=${tags} loading="lazy" />
                 <div class=info>

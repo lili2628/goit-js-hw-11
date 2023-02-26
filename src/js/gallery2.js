@@ -1,7 +1,8 @@
-import '../css/common.css';
+
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+import '../css/common.css';
 import galleryCardAdditionalTpl from './templates/gallery-additional';
 import throttle from 'lodash.throttle';
 import SearchService from './searchService';
@@ -74,7 +75,7 @@ async function onLoadMore() {
             if (totalHits <= searchService.viewedPhotoes) {
                 onScroll();
                 window.removeEventListener('scroll', onLoadMore);
-                
+
                 return;
             }
                 
