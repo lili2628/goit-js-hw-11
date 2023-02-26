@@ -17,7 +17,7 @@ let lastScroll = 0;
 
 searchFormEl.addEventListener('submit', onSearch);
 loadMoreBtn.button.addEventListener('click', onLoadMore);
-window.addEventListener('scroll', throttle(onScroll, 500));
+window.addEventListener('scroll', throttle(onScroll, 750));
 
 async function onSearch(e) {
     e.preventDefault();
@@ -66,7 +66,7 @@ async function onLoadMore() {
         endOfCollection(totalHits, searchService.viewedPhotoes, searchService.perPage);
     
     } catch (error) {
-        onLoadMore(error);
+        onSomeError(error);
     }
 }
 
