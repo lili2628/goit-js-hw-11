@@ -12,6 +12,7 @@ export default class SearchService {
     
     async fetchArticles() {
         const url = `${BASE_URL}/api/?key=${KEY}&q=${this.searchWord}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${this.perPage}&page=${this.page}`;
+        
         try {
             const response = await axios.get(url);
             const data = await response.data;
@@ -20,6 +21,7 @@ export default class SearchService {
             this.viewedPhotoes += data.hits.length;
 
             return data;
+            
         } catch (error) {
             console.error(error);
         }

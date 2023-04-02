@@ -10,16 +10,14 @@ import LoadMoreBtn from './load-more-btn';
 const searchFormEl = document.querySelector('#search-form');
 const cardContainerEl = document.querySelector('.gallery');
 
-
 const submitBtn = new LoadMoreBtn({ selector: '.submit-btn', hidden: false })
 const searchService = new SearchService();
 
 let lastScroll = 0;
 
 searchFormEl.addEventListener('submit', onSearch);
-window.addEventListener('scroll', throttle(onLoadMore, 500));
 
-async function onSearch(e) {
+function onSearch(e) {
     e.preventDefault();
     clearCardcontainer();
 
@@ -33,7 +31,20 @@ async function onSearch(e) {
     searchService.resetViewedPhotoes();
     submitBtn.disabled();
 
-    try {
+    let infiniteObserver = new IntersectionObserver(([entry], observer) => {
+        if (entry.isIntersecting) {
+            observer.unobserve(entry.target);
+
+            loadPhotoes(infiniteObserver);
+            searchService.incrementPage();
+        }
+    }, {
+        threshold: 1,
+    });
+}
+
+async function loadPhotoes (obs) {
+        try {
         const { hits, totalHits } = await searchService.fetchArticles();
 
         if (isArrayOfDataAmpty(hits.length)) {
@@ -42,44 +53,20 @@ async function onSearch(e) {
 
         totalFoundPicturesMessage(totalHits);
         appendPhotoCardMarkup(hits);
-        submitBtn.enable();      
+        submitBtn.enable();  
+        
+        const lastPhoto = document.querySelector('.gallery:last-child');
+         
+        if (lastPhoto) {
+            obs.observe(lastPhoto);
+        }
         
     } catch (error) {
         onSomeError(error);
     };  
 }
 
-async function onLoadMore() {
 
-    if (searchService.viewedPhotoes < searchService.perPage && window.pageYOffset + document.documentElement.clientHeight >= getDocHeight() - 10) {
-        endOfResultsMessage();
-
-        return;
-    }
-    
-    if (searchService.viewedPhotoes < searchService.perPage) {
-        return;
-    }
-    
-    if (window.pageYOffset + document.documentElement.clientHeight >= getDocHeight() - 20) {   
-        try {
-            const { hits, totalHits } = await searchService.fetchArticles();
-
-            appendPhotoCardMarkup(hits);
-            smoothScroll('gallery');
-
-            if (totalHits <= searchService.viewedPhotoes) {
-                onScroll();
-                window.removeEventListener('scroll', onLoadMore);
-
-                return;
-            }  
-            
-        } catch (error) {
-            onSomeError(error);
-        };
-    }
-}
 
 function endOfResultsMessage() {
     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
@@ -109,18 +96,6 @@ function smoothScroll(className) {
     });
 }
 
-function onScroll() {
-    if (scrollPosition() > lastScroll) {   
-        endOfResultsMessage();
-    };
-    
-    lastScroll = scrollPosition(); 
-}
-
-function scrollPosition() {
-    return window.pageYOffset || document.documentElement.scroll;
-}
-
 function isSearchQueryAmpty(searchQuery) {
     if (searchQuery === '') {
         Notiflix.Notify.warning("Please, enter a search query!");
@@ -148,11 +123,5 @@ function clearCardcontainer() {
     cardContainerEl.innerHTML = '';
 }
 
-function getDocHeight() {
-    return Math.max(
-        document.body.scrollHeight, document.documentElement.scrollHeight,
-        document.body.offsetHeight, document.documentElement.offsetHeight,
-        document.body.clientHeight, document.documentElement.clientHeight
-    );
-}
+
 
