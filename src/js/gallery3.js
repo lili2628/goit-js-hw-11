@@ -3,7 +3,7 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import '../css/common.css';
 import galleryCardAdditionalTpl from './templates/gallery-additional';
-import throttle from 'lodash.throttle';
+//import throttle from 'lodash.throttle';
 import SearchService from './searchService';
 import LoadMoreBtn from './load-more-btn';
 
@@ -13,13 +13,14 @@ const cardContainerEl = document.querySelector('.gallery');
 const submitBtn = new LoadMoreBtn({ selector: '.submit-btn', hidden: false })
 const searchService = new SearchService();
 
-let lastScroll = 0;
-
 searchFormEl.addEventListener('submit', onSearch);
 
-function onSearch(e) {
+async function onSearch(e) {
     e.preventDefault();
     clearCardcontainer();
+
+    const lastPhoto = document.querySelector('.endPage');
+    observer.unobserve(lastPhoto);
 
     searchService.word = e.currentTarget.elements.searchQuery.value.trim();
     
@@ -31,42 +32,51 @@ function onSearch(e) {
     searchService.resetViewedPhotoes();
     submitBtn.disabled();
 
-    let infiniteObserver = new IntersectionObserver(([entry], observer) => {
-        if (entry.isIntersecting) {
-            observer.unobserve(entry.target);
-
-            loadPhotoes(infiniteObserver);
-            searchService.incrementPage();
-        }
-    }, {
-        threshold: 1,
-    });
-}
-
-async function loadPhotoes (obs) {
-        try {
+    try {
         const { hits, totalHits } = await searchService.fetchArticles();
 
-        if (isArrayOfDataAmpty(hits.length)) {
+         if (isArrayOfDataAmpty(hits.length)) {
             return;
         }
 
         totalFoundPicturesMessage(totalHits);
         appendPhotoCardMarkup(hits);
-        submitBtn.enable();  
-        
-        const lastPhoto = document.querySelector('.gallery:last-child');
-         
-        if (lastPhoto) {
-            obs.observe(lastPhoto);
-        }
-        
+        submitBtn.enable();
+        observer.observe(lastPhoto);
+       // return;
+
     } catch (error) {
         onSomeError(error);
-    };  
+    };
 }
 
 
+
+const onloadPhotoes = async entries => {
+    entries.forEach(async entry => {
+        try {
+            if (searchService.totalHits <= searchService.viewedPhotoes) {
+            endOfResultsMessage();
+            return;
+        }
+
+            if (entry.isIntersecting
+                && searchService.totalHits > searchService.viewedPhotoe
+                && searchService.word !== '') {
+            const { hits } = await searchService.fetchArticles();
+            appendPhotoCardMarkup(hits);
+            smoothScroll();
+        }
+        } catch (error) {
+            onSomeError(error);
+        }
+        
+    });
+};
+
+const observer = new IntersectionObserver(onloadPhotoes, {
+    rootMargin: '200px',
+});
 
 function endOfResultsMessage() {
     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
