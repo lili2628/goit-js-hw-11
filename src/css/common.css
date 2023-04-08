@@ -134,3 +134,24 @@ img {
   margin-bottom: 20px;
   padding: 10px;
 }
+
+.pagination{
+  display: flex;
+  justify-content: center;
+}
+
+.pagination__list{
+  display: flex;
+  list-style-type: none;
+}
+
+.pagination__item {
+  padding: 5px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.pagination__item--select {
+  font-weight: 800;
+  color: red;
+}
